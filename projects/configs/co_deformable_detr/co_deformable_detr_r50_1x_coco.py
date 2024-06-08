@@ -5,6 +5,8 @@ _base_ = [
 # model settings
 num_dec_layer = 6
 lambda_2 = 2.0
+max_det_per_img = 50
+IMG_SIZE = 1000
 
 model = dict(
     type='CoDETR',
@@ -45,8 +47,8 @@ model = dict(
         loss_bbox=dict(type='L1Loss', loss_weight=1.0*num_dec_layer*lambda_2)),
     query_head=dict(
         type='CoDeformDETRHead',
-        num_query=300,
-        num_classes=80,
+        num_query=max_det_per_img,
+        num_classes=3,
         in_channels=2048,
         sync_cls_avg_factor=True,
         with_box_refine=True,
@@ -113,7 +115,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=80,
+            num_classes=3,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
@@ -125,7 +127,7 @@ model = dict(
             loss_bbox=dict(type='GIoULoss', loss_weight=10.0*num_dec_layer*lambda_2)))],
     bbox_head=[dict(
         type='CoATSSHead',
-        num_classes=80,
+        num_classes=3,
         in_channels=256,
         stacked_convs=1,
         feat_channels=256,
@@ -201,7 +203,7 @@ model = dict(
             pos_weight=-1,
             debug=False),],
     test_cfg=[
-        dict(max_per_img=100),
+        dict(max_per_img=max_det_per_img),
         dict(
             rpn=dict(
                 nms_pre=1000,
@@ -211,13 +213,13 @@ model = dict(
             rcnn=dict(
                 score_thr=0.0,
                 nms=dict(type='nms', iou_threshold=0.5),
-                max_per_img=100)),
+                max_per_img=max_det_per_img)),
         dict(
             nms_pre=1000,
             min_bbox_size=0,
             score_thr=0.0,
             nms=dict(type='nms', iou_threshold=0.6),
-            max_per_img=100),
+            max_per_img=max_det_per_img),
         # soft-nms is also supported for rcnn testing
         # e.g., nms=dict(type='soft_nms', iou_threshold=0.5, min_score=0.05)
     ])
@@ -229,6 +231,7 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
+    # dict(type='Resize', img_scale=(IMG_SIZE, IMG_SIZE), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(
         type='AutoAugment',
@@ -292,7 +295,7 @@ test_pipeline = [
 ]
 
 data = dict(
-    samples_per_gpu=2,
+    samples_per_gpu=5,
     workers_per_gpu=2,
     train=dict(filter_empty_gt=False, pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
@@ -311,4 +314,4 @@ optimizer = dict(
 optimizer_config = dict(grad_clip=dict(max_norm=0.1, norm_type=2))
 # learning policy
 lr_config = dict(policy='step', step=[11])
-runner = dict(type='EpochBasedRunner', max_epochs=12)
+runner = dict(type='EpochBasedRunner', max_epochs=1000)

@@ -72,6 +72,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+notebooks/
 
 # pyenv
 .python-version
@@ -90,7 +91,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+detr/
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -123,3 +124,4 @@ work_dirs/
 *.py~
 *.sh~
 
+results.json
