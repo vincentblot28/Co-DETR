@@ -113,7 +113,7 @@ data = dict(
 # optimizer
 optimizer = dict(
     type='AdamW',
-    lr=1e-4,
+    lr=1e-3,
     weight_decay=0.0001,
     # custom_keys of sampling_offsets and reference_points in DeformDETR
     paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.1)}))

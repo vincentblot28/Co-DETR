@@ -45,7 +45,7 @@ model = dict(
         loss_bbox=dict(type='L1Loss', loss_weight=1.0*num_dec_layer*lambda_2)),
     query_head=dict(
         type='CoDINOHead',
-        num_query=100,
+        num_query=1000,
         num_classes=3,
         num_feature_levels=5,
         in_channels=2048,
